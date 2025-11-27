@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>TODOs</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 2rem;
+      }
+
+      .todo {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+      }
+
+      .controls form,
+      .controls a {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>TODOs</h1>
+    <p><a href="{% url 'todos:add' %}">+ Create new TODO</a></p>
+
+    {% if todos %}
+      {% for todo in todos %}
+        <article class="todo">
+          <header>
+            <h2>{{ todo.title }}</h2>
+            <p>
+              <strong>Due:</strong>
+              {{ todo.due_date|default:"—" }}
+              • <strong>Status:</strong>
+              {% if todo.is_resolved %}
+                Resolved
+              {% else %}
+                Open
+              {% endif %}
+            </p>
+          </header>
+          {% if todo.description %}
+            <p>{{ todo.description }}</p>
+          {% endif %}
+          <div class="controls">
+            <form method="post" action="{% url 'todos:toggle_resolved' todo.pk %}">
+              {% csrf_token %}
+              <button type="submit">
+                {% if todo.is_resolved %}Mark as open{% else %}Mark as resolved{% endif %}
+              </button>
+            </form>
+            <a href="{% url 'todos:edit' todo.pk %}">Edit</a>
+            <a href="{% url 'todos:delete' todo.pk %}">Delete</a>
+          </div>
+        </article>
+      {% endfor %}
+    {% else %}
+      <p>No TODOs yet.</p>
+    {% endif %}
+  </body>
+</html>
+
